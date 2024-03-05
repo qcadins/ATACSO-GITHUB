@@ -79,7 +79,7 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                     'verify current date'
                     arrayMatch.add(WebUI.verifyMatch(currentDate, result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 
-                    'verify ip address'
+                    'verify ip address. Hardcode karena tidak mendapatkan IP Address (belum ada info)'
                     arrayMatch.add(WebUI.verifyMatch('127.0.0.1', result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 
                     'verify log detail'

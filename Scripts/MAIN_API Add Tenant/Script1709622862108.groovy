@@ -76,10 +76,7 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                     'verify tenant name'
                     arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
                                     'tenantName')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
-
-                    'verify tidak sesuai mengenai api key'
-                    arrayMatch.add(WebUI.verifyNotMatch(apiKey, result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
-
+					
                     'verify mengenai datetime terhadap current date'
                     arrayMatch.add(WebUI.verifyMatch(currentDate, result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 

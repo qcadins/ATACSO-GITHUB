@@ -5,4 +5,30 @@
    <tag></tag>
    <comment></comment>
    <testCaseGuid>cd41aef0-5220-4d17-8beb-6f375f0760f4</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>43c504f3-ebfc-4323-8828-6bddd761d18a</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>b791dffc-bff0-4bf8-a4c3-85f96f4521b1</variableId>
+   </variableLinks>
+   <variable>
+      <defaultValue>'API/Add Tenant'</defaultValue>
+      <description></description>
+      <id>43c504f3-ebfc-4323-8828-6bddd761d18a</id>
+      <masked>false</masked>
+      <name>excelPath</name>
+   </variable>
+   <variable>
+      <defaultValue>'API Add Tenant'</defaultValue>
+      <description></description>
+      <id>b791dffc-bff0-4bf8-a4c3-85f96f4521b1</id>
+      <masked>false</masked>
+      <name>sheet</name>
+   </variable>
 </TestCaseEntity>

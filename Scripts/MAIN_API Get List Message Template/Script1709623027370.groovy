@@ -21,12 +21,12 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break
     } else if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).equalsIgnoreCase('Unexecuted')) {
-        GlobalVariable.FlagFailed = 0
+		'inisiasi flag failed = 0'
+		GlobalVariable.FlagFailed = 0
 
-        WebUI.callTestCase(findTestCase('Login By Role'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
+		'call test case untuk mendapatkan api key'
+		WebUI.callTestCase(findTestCase('Login By Role'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
 
-        if (GlobalVariable.AdInsKey == '') {
-        } else {
             'HIT API'
             respon = WS.sendRequest(findTestObject('Postman/Get List Message Template', [('requestDateTime') : findTestData(excelPath).getValue(
                             GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : findTestData(excelPath).getValue(
@@ -52,26 +52,61 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
 
             'Jika status HIT API Login 200 OK'
             if (WS.verifyResponseStatusCode(respon, 200, FailureHandling.OPTIONAL) == true) {
-                'get Status Code'
-                statusCode = WS.getElementPropertyValue(respon, 'status.code', FailureHandling.OPTIONAL)
+            'get API Key'
+            apiKey = WS.getElementPropertyValue(respon, 'ApiKey', FailureHandling.OPTIONAL)
 
-                'Jika status codenya 0'
-                if (statusCode == 0) {
-                    if (GlobalVariable.checkStoreDB == 'Yes') {
+            'Jika API Key tidak kosong'
+            if (apiKey.toString() != 'null') {
+                'jika setting check store db hidup'
+                if (GlobalVariable.checkStoreDB == 'Yes') {
+                    'get current date'
+                    String currentDate = new Date().format('yyyy-MM-dd')
+
+                    'ambil store db untuk add tenant'
+                    ArrayList result = CustomKeywords.'connection.AddTenant.getAddTenantStoreDB'(connAcso, findTestData(
+                            excelPath).getValue(GlobalVariable.NumofColm, rowExcel('tenantCode')))
+
+                    'declare arraylist arraymatch'
+                    ArrayList arrayMatch = []
+
+                    'declare arrayindex'
+                    arrayIndex = 0
+
+                    'verify tenant code'
+                    arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
+                                    'tenantCode')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                    'verify tenant name'
+                    arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
+                                    'tenantName')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+					
+                    'verify mengenai datetime terhadap current date'
+                    arrayMatch.add(WebUI.verifyMatch(currentDate, result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                    'jika data db tidak sesuai dengan excel'
+                    if (arrayMatch.contains(false)) {
+                        GlobalVariable.FlagFailed = 1
+
+                        'Write To Excel GlobalVariable.StatusFailed and GlobalVariable.ReasonFailedStoredDB'
+                        CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, 
+                            GlobalVariable.StatusFailed, (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
+                                    'Reason Failed')) + ';') + GlobalVariable.ReasonFailedStoredDB)
                     }
-                    
-                    if (GlobalVariable.FlagFailed == 0) {
-                        'write to excel success'
-                        CustomKeywords.'customizekeyword.WriteExcel.writeToExcel'(GlobalVariable.DataFilePath, sheet, 0, 
-                            GlobalVariable.NumofColm - 1, GlobalVariable.StatusSuccess)
-                    }
-                } else {
-                    getErrorMessageAPI(respon)
+                }
+                
+                'jika Flag failednya 0'
+                if (GlobalVariable.FlagFailed == 0) {
+                    'write to excel success'
+                    CustomKeywords.'customizekeyword.WriteExcel.writeToExcel'(GlobalVariable.DataFilePath, sheet, 0, GlobalVariable.NumofColm - 
+                        1, GlobalVariable.StatusSuccess)
                 }
             } else {
+                'get error message API'
                 getErrorMessageAPI(respon)
             }
-        }
+        } else {
+                getErrorMessageAPI(respon)
+            }
     }
 }
 
