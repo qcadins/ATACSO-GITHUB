@@ -10,8 +10,6 @@ import java.sql.Connection as Connection
 
 Connection conneSign = CustomKeywords.'connection.ConnectDB.connectDBACSO'()
 
-int gakepake
-
 'get data file path'
 GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExcelPath'('\\Excel\\2. ACSO.xlsx')
 
