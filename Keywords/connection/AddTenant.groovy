@@ -1,12 +1,10 @@
 package connection
 
-import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
 import java.sql.Statement
 import com.kms.katalon.core.annotation.Keyword
-import internal.GlobalVariable
 
 class AddTenant {
 
