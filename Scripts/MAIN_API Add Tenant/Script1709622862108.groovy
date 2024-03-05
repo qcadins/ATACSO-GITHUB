@@ -14,6 +14,7 @@ GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExc
 
 int countColmExcel = findTestData(excelPath).columnNumbers
 
+int notused
 semicolon = ';'
 
 for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (GlobalVariable.NumofColm)++) {
