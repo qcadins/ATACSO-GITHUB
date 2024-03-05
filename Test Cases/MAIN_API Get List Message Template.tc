@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>ATEENDIGO-339</description>
+   <name>MAIN_API Get List Message Template</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>66c70b4b-9391-421a-8870-1769c007e874</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>6b7c222c-abed-4504-8c73-0085eb93802d</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>00fa1469-8dca-4dde-93b9-42b23f1f347c</variableId>
+   </variableLinks>
+   <variable>
+      <defaultValue>'API/Get List Message Template'</defaultValue>
+      <description></description>
+      <id>6b7c222c-abed-4504-8c73-0085eb93802d</id>
+      <masked>false</masked>
+      <name>excelPath</name>
+   </variable>
+   <variable>
+      <defaultValue>'API Get List Message Template'</defaultValue>
+      <description></description>
+      <id>00fa1469-8dca-4dde-93b9-42b23f1f347c</id>
+      <masked>false</masked>
+      <name>sheet</name>
+   </variable>
+</TestCaseEntity>

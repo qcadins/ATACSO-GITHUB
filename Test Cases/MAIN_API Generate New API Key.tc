@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>MAIN_API Generate New API Key</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>e90c38d9-312f-4e5e-a1fd-7bafb024ed54</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>321f0069-f493-4493-9bff-bbbf3dc6ed27</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>b5be5043-83d2-47c9-9461-0ca3699e6fd3</variableId>
+   </variableLinks>
+   <variable>
+      <defaultValue>'API/Generate New API Key'</defaultValue>
+      <description></description>
+      <id>321f0069-f493-4493-9bff-bbbf3dc6ed27</id>
+      <masked>false</masked>
+      <name>excelPath</name>
+   </variable>
+   <variable>
+      <defaultValue>'API Generate New API Key'</defaultValue>
+      <description></description>
+      <id>b5be5043-83d2-47c9-9461-0ca3699e6fd3</id>
+      <masked>false</masked>
+      <name>sheet</name>
+   </variable>
+</TestCaseEntity>

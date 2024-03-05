@@ -1,0 +1,16 @@
+{
+  "keywordFileContentHash": "4A48FEB522A353E741A62B818D7F6AEB",
+  "keywordClasses": [
+    {
+      "name": "connection.ConnectDB",
+      "keywordMethods": [
+        {
+          "name": "connectDBACSO",
+          "parameters": [],
+          "javadoc": ""
+        }
+      ]
+    }
+  ],
+  "javadocParsed": true
+}
