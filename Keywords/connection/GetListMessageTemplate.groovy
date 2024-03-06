@@ -23,7 +23,7 @@ class GetListMessageTemplate {
 			helperQuery = " AND mmt.template_code = '" + templateCode + "'"
 		} else if (dataLimit.length() != 0 && dataOffset.length() != 0) {
 			helperQuery = " OFFSET " + dataOffset + " LIMIT " + dataLimit
-		} else if (dataLimit.length() == 0 && dataOffset.length() == 0){
+		} else if (dataLimit.length() == 0 && dataOffset.length() == 0) {
 			helperQuery = " LIMIT 10"
 		} else {
 			helperQuery = ''
