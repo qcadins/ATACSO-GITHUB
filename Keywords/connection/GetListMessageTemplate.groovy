@@ -20,11 +20,15 @@ class GetListMessageTemplate {
 		stm = conn.createStatement()
 
 		if (templateCode != '') {
-			helperQuery = " AND mmt.template_code = '"+templateCode+"'"
+			helperQuery = " AND mmt.template_code = '" + templateCode + "'"
+		} else if (dataLimit.length() != 0 && dataOffset.length() != 0) {
+			helperQuery = " OFFSET " + dataOffset + " LIMIT " + dataLimit
+		} else if (dataLimit.length() == 0 && dataOffset.length() == 0){
+			helperQuery = " LIMIT 10"
 		} else {
-			helperQuery = " OFFSET "+dataOffset+" LIMIT "+dataLimit+""
+			helperQuery = ''
 		}
-		resultSet = stm.executeQuery("select mmt.template_type, mmt.template_code, mmt.template_name, mmt.template_description, mmt.template_language, null from ms_msg_template mmt left join ms_tenant mst on mmt.id_ms_tenant = mst.id_ms_tenant where mst.tenant_code = '"+tenantCode+"'"+helperQuery+"")
+		resultSet = stm.executeQuery("select mmt.template_type, mmt.template_code, mmt.template_name, mmt.template_description, mmt.template_language, null from ms_msg_template mmt left join ms_tenant mst on mmt.id_ms_tenant = mst.id_ms_tenant where mst.tenant_code = '" + tenantCode + "'" + helperQuery)
 		metadata = resultSet.metaData
 
 		columnCount = metadata.getColumnCount()

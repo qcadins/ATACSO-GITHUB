@@ -23,14 +23,10 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
     } else if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).equalsIgnoreCase('Unexecuted')) {
         GlobalVariable.FlagFailed = 0
 
-        WebUI.callTestCase(findTestCase('Login By Role'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
 
-        if (GlobalVariable.AdInsKey == '') {
-        } else {
             'HIT API'
-            respon = WS.sendRequest(findTestObject('Postman/Process Message Request', [('requestDateTime') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('rowVersion')), ('from_phone_number') : findTestData(excelPath).getValue(
+            respon = WS.sendRequest(findTestObject('Postman/Process Message Callback', [('requestDateTime') : findTestData(excelPath).getValue(
+                            GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : '', ('from_phone_number') : findTestData(excelPath).getValue(
                             GlobalVariable.NumofColm, rowExcel('from_phone_number')), ('to_phone_number') : findTestData(excelPath).getValue(
                             GlobalVariable.NumofColm, rowExcel('to_phone_number')), ('id') : findTestData(excelPath).getValue(
                             GlobalVariable.NumofColm, rowExcel('id')), ('conversation_id') : findTestData(excelPath).getValue(
@@ -79,7 +75,6 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
             } else {
                 getErrorMessageAPI(respon)
             }
-        }
     }
 }
 

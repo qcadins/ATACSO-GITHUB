@@ -25,4 +25,19 @@ class DataVerif {
 			GlobalVariable.base_url = findTestData('Login/Login').getValue(3, 2)
 		}
 	}
+
+	@Keyword
+	getMaxDataLimitPagination(Connection conn) {
+		stm = conn.createStatement()
+
+		resultSet = stm.executeQuery("select gs_value from am_general_setting where gs_code = 'MAX_DATA_LIMIT_PAGINATION'")
+		metadata = resultSet.metaData
+
+		columnCount = metadata.getColumnCount()
+
+		while (resultSet.next()) {
+			data = resultSet.getObject(1)
+		}
+		data
+	}
 }

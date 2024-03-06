@@ -19,7 +19,7 @@ class GenerateAPIKey {
 	getGenerateNewAPIKeyStoreDB(Connection conn, String tenantCode) {
 		stm = conn.createStatement()
 
-		resultSet = stm.executeQuery("select mst.hashed_api_key, msl.description, TO_CHAR(trc.update_date, 'yyyy-MM-dd'), trc.ip_address, trc.update_details, TO_CHAR(trc.dtm_crt, 'yyyy-mm-dd'), TO_CHAR(mst.dtm_upd, 'yyyy-mm-dd') from tr_credential_update_log trc left join ms_lov msl on trc.lov_update_type = msl.id_ms_lov left join ms_tenant mst on trc.id_ms_tenant = mst.id_ms_tenant where mst.tenant_code = '" + tenantCode + "' order by trc.dtm_crt desc limit 1")
+		resultSet = stm.executeQuery("select msl.description, TO_CHAR(trc.update_date, 'yyyy-MM-dd'), trc.ip_address, trc.update_details, TO_CHAR(trc.dtm_crt, 'yyyy-mm-dd'), TO_CHAR(mst.dtm_upd, 'yyyy-mm-dd') from tr_credential_update_log trc left join ms_lov msl on trc.lov_update_type = msl.id_ms_lov left join ms_tenant mst on trc.id_ms_tenant = mst.id_ms_tenant where mst.tenant_code = '" + tenantCode + "' order by trc.dtm_crt desc limit 1")
 		metadata = resultSet.metaData
 
 		columnCount = metadata.getColumnCount()

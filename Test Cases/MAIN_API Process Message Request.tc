@@ -4,30 +4,30 @@
    <name>MAIN_API Process Message Request</name>
    <tag></tag>
    <comment></comment>
-   <testCaseGuid>8b611612-2fed-4034-a3b5-5ba720320327</testCaseGuid>
+   <testCaseGuid>d4620857-4f7d-4f91-80cf-062d0285cba4</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>
       <type>DEFAULT</type>
       <value></value>
-      <variableId>2d6a22e9-7518-4516-8ea4-a67dd001bb02</variableId>
+      <variableId>f4ae0202-a856-49e3-b15c-5df83d03bb00</variableId>
    </variableLinks>
    <variableLinks>
       <testDataLinkId></testDataLinkId>
       <type>DEFAULT</type>
       <value></value>
-      <variableId>cca82988-deeb-472d-990c-3d72c17846fc</variableId>
+      <variableId>584e01fa-673e-4fbb-b553-f4bc22673e2b</variableId>
    </variableLinks>
    <variable>
       <defaultValue>'API/Process Message Request'</defaultValue>
       <description></description>
-      <id>2d6a22e9-7518-4516-8ea4-a67dd001bb02</id>
+      <id>f4ae0202-a856-49e3-b15c-5df83d03bb00</id>
       <masked>false</masked>
       <name>excelPath</name>
    </variable>
    <variable>
       <defaultValue>'API Process Message Request'</defaultValue>
       <description></description>
-      <id>cca82988-deeb-472d-990c-3d72c17846fc</id>
+      <id>584e01fa-673e-4fbb-b553-f4bc22673e2b</id>
       <masked>false</masked>
       <name>sheet</name>
    </variable>

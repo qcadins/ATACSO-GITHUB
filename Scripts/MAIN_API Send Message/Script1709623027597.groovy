@@ -8,7 +8,7 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable as GlobalVariable
 import java.sql.Connection as Connection
 
-Connection conneSign = CustomKeywords.'connection.ConnectDB.connectDBACSO'()
+Connection connAcso = CustomKeywords.'connection.ConnectDB.connectDBACSO'()
 
 'get data file path'
 GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExcelPath'('\\Excel\\2. ACSO.xlsx')
@@ -21,18 +21,21 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break
     } else if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).equalsIgnoreCase('Unexecuted')) {
+        'inisiasi flag failed = 0'
         GlobalVariable.FlagFailed = 0
 
-        WebUI.callTestCase(findTestCase('Login By Role'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
+        'call test case untuk mendapatkan api key'
+        WebUI.callTestCase(findTestCase('Generate New API Key'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
 
-        if (GlobalVariable.AdInsKey == '') {
-        } else {
             'HIT API'
             respon = WS.sendRequest(findTestObject('Postman/Send Message', [('requestDateTime') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('rowVersion')), ('tenantCode') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('tenantCode')), ('tenantName') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('tenantName'))]))
+                            GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') :'', ('receiverPhone') : findTestData(excelPath).getValue(
+                            GlobalVariable.NumofColm, rowExcel('receiverPhone')), ('referenceNo') : findTestData(excelPath).getValue(
+                            GlobalVariable.NumofColm, rowExcel('referenceNo')), ('templateCode') : findTestData(excelPath).getValue(
+                            GlobalVariable.NumofColm, rowExcel('templateCode')), ('headerParam') : findTestData(excelPath).getValue(
+                            GlobalVariable.NumofColm, rowExcel('headerParam')), ('bodyParam') : findTestData(excelPath).getValue(
+                            GlobalVariable.NumofColm, rowExcel('bodyParam')), ('buttonParam') : findTestData(excelPath).getValue(
+                            GlobalVariable.NumofColm, rowExcel('buttonParam'))]))
 
             'ambil lama waktu yang diperlukan hingga request menerima balikan'
             elapsedTime = ((respon.elapsedTime / 1000) + ' second')
@@ -50,36 +53,88 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
 
             'Jika status HIT API Login 200 OK'
             if (WS.verifyResponseStatusCode(respon, 200, FailureHandling.OPTIONAL) == true) {
-                'get Status Code'
-                statusCode = WS.getElementPropertyValue(respon, 'status.code', FailureHandling.OPTIONAL)
+            'get API Key'
+            apiKey = WS.getElementPropertyValue(respon, 'ApiKey', FailureHandling.OPTIONAL)
 
-                'Jika status codenya 0'
-                if (statusCode == 0) {
-                    if (GlobalVariable.checkStoreDB == 'Yes') {
+            'Jika API Key tidak kosong'
+            if (apiKey.toString() != 'null') {
+                'jika setting check store db hidup'
+                if (GlobalVariable.checkStoreDB == 'Yes') {
+                    'get current date'
+                    String currentDate = new Date().format('yyyy-MM-dd')
+
+                    'ambil store db untuk add tenant'
+                    ArrayList result = CustomKeywords.'connection.SendMessage.getSendMessageStoreDB'(connAcso, findTestData(
+                            excelPath).getValue(GlobalVariable.NumofColm, rowExcel('tenantCode')), findTestData(
+                            excelPath).getValue(GlobalVariable.NumofColm, rowExcel('templateCode')) )
+
+                    'declare arraylist arraymatch'
+                    ArrayList arrayMatch = []
+
+                    'declare arrayindex'
+                    arrayIndex = 0
+
+                    'verify tenant code'
+                    arrayMatch.add(WebUI.verifyMatch(currentDate, result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                    'verify tenant name'
+                    arrayMatch.add(WebUI.verifyMatch('Single Request Whatsapp', result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+					
+                    'verify mengenai datetime terhadap current date'
+                    arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('tenantCode')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+					'verify mengenai datetime terhadap current date'
+					arrayMatch.add(WebUI.verifyNotMatch('', result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+					'verify mengenai datetime terhadap current date'
+					arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('referenceNo')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+					'verify mengenai datetime terhadap current date'
+					arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('templateCode')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+					'verify mengenai datetime terhadap current date'
+					arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('templateCode')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+					'verify mengenai datetime terhadap current date'
+					arrayMatch.add(WebUI.verifyNotMatch('0', result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+					
+					'verify mengenai datetime terhadap current date'
+					arrayMatch.add(WebUI.verifyMatch('0', result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                    'jika data db tidak sesuai dengan excel'
+                    if (arrayMatch.contains(false)) {
+                        GlobalVariable.FlagFailed = 1
+
+                        'Write To Excel GlobalVariable.StatusFailed and GlobalVariable.ReasonFailedStoredDB'
+                        CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, 
+                            GlobalVariable.StatusFailed, (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
+                                    'Reason Failed')) + ';') + GlobalVariable.ReasonFailedStoredDB)
                     }
-                    
-                    if (GlobalVariable.FlagFailed == 0) {
-                        'write to excel success'
-                        CustomKeywords.'customizekeyword.WriteExcel.writeToExcel'(GlobalVariable.DataFilePath, sheet, 0, 
-                            GlobalVariable.NumofColm - 1, GlobalVariable.StatusSuccess)
-                    }
-                } else {
-                    getErrorMessageAPI(respon)
+                }
+                
+                'jika Flag failednya 0'
+                if (GlobalVariable.FlagFailed == 0) {
+                    'write to excel success'
+                    CustomKeywords.'customizekeyword.WriteExcel.writeToExcel'(GlobalVariable.DataFilePath, sheet, 0, GlobalVariable.NumofColm - 
+                        1, GlobalVariable.StatusSuccess)
                 }
             } else {
+                'get error message API'
                 getErrorMessageAPI(respon)
             }
-        }
+        } else {
+                getErrorMessageAPI(respon)
+            }
     }
 }
 
 def getErrorMessageAPI(ResponseObject respon) {
     'mengambil status code berdasarkan response HIT API'
-    message = WS.getElementPropertyValue(respon, 'status.message', FailureHandling.OPTIONAL)
+    message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
 
     'Write To Excel GlobalVariable.StatusFailed and errormessage'
     CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, GlobalVariable.StatusFailed, 
-        ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Reason Failed')) + ';') + ('<' + message)) + 
+        ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Reason Failed')).replace('-', '') + ';') + ('<' + message)) + 
         '>')
 
     GlobalVariable.FlagFailed = 1

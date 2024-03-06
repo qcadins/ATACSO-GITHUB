@@ -13,6 +13,7 @@ Connection connAcso = CustomKeywords.'connection.ConnectDB.connectDBACSO'()
 'get data file path'
 GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExcelPath'('\\Excel\\2. ACSO.xlsx')
 
+'dapat total column'
 int countColmExcel = findTestData(excelPath).columnNumbers
 
 semicolon = ';'
@@ -27,22 +28,30 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
         'call test case untuk mendapatkan api key'
         WebUI.callTestCase(findTestCase('Generate New API Key'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
 
+		'rakit paginationDetails'
         String paginationDetails = ''
 
+		'jika dataLimit atau data offset ada value'
         if ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')).length() > 0) || (findTestData(
             excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')).length() > 0)) {
+			'rakit'
             paginationDetails = (paginationDetails + '"paginationDetails": {')
 
+			'jika data limit ada value'
             if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')).length() > 0) {
+				'rakit datalimit'
                 paginationDetails = (((paginationDetails + '"dataLimit": ') + findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
                     rowExcel('dataLimit'))) + ',')
             }
             
+			'jika data offset ada value'
             if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')).length() > 0) {
+				'rakit data offset'
                 paginationDetails = (((paginationDetails + '"dataOffset": ') + findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
                     rowExcel('dataOffset'))) + ',')
             }
             
+			'menghapus akhir comma'
             paginationDetails = (paginationDetails.replaceAll('(,*$)', '') + '},')
         }
         
@@ -81,17 +90,35 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                     'declare arraylist arraymatch'
                     ArrayList arrayMatch = []
 
-                    'get API Key'
+                    'get data limit'
                     dataLimit = WS.getElementPropertyValue(respon, 'DataLimit', FailureHandling.OPTIONAL)
 
-                    'get API Key'
+                    'get data offset'
                     dataOffset = WS.getElementPropertyValue(respon, 'DataOffset', FailureHandling.OPTIONAL)
 
-					'get API Key'
-					totalData = WS.getElementPropertyValue(respon, 'TotalData', FailureHandling.OPTIONAL)
+                    'get totall data'
+                    totalData = WS.getElementPropertyValue(respon, 'TotalData', FailureHandling.OPTIONAL)
 
-                    'get API Key'
+                    'get total results'
                     ArrayList resultsAll = WS.getElementPropertyValue(respon, 'Results', FailureHandling.OPTIONAL)
+
+                    'get parameter details'
+                    parameterDetails = WS.getElementPropertyValue(respon, 'Results.ParameterDetails', FailureHandling.OPTIONAL)
+
+					'get template type'
+                    templateType = WS.getElementPropertyValue(respon, 'Results.TemplateType', FailureHandling.OPTIONAL)
+
+					'get template code'
+                    templateCode = WS.getElementPropertyValue(respon, 'Results.TemplateCode', FailureHandling.OPTIONAL)
+
+					'get template name'
+                    templateName = WS.getElementPropertyValue(respon, 'Results.TemplateName', FailureHandling.OPTIONAL)
+
+					'get template description'
+                    templateDescription = WS.getElementPropertyValue(respon, 'Results.TemplateDescription', FailureHandling.OPTIONAL)
+
+					'get template language'
+                    templateLanguage = WS.getElementPropertyValue(respon, 'Results.TemplateLanguage', FailureHandling.OPTIONAL)
 
                     'ambil store db untuk add tenant'
                     ArrayList result = CustomKeywords.'connection.GetListMessageTemplate.getGetListMessageTemplateStoreDB'(
@@ -100,50 +127,55 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                             GlobalVariable.NumofColm, rowExcel('dataLimit')), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
                             rowExcel('dataOffset')))
 
-                    WebUI.verifyEqual(resultsAll.size(), result.size() / 6, FailureHandling.CONTINUE_ON_FAILURE)
+					'array match mengenai total data results'
+                    arrayMatch.add(WebUI.verifyEqual(resultsAll.size(), result.size() / 6, FailureHandling.CONTINUE_ON_FAILURE))
+
+					'array match mengenai total data'
+                    arrayMatch.add(WebUI.verifyEqual(totalData, result.size() / 6, FailureHandling.CONTINUE_ON_FAILURE))
+
+					'jika datalimit dan kosong dan template code kosong'
+                    if ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')) == '')) {
+						'ambil max limit dari genset'
+                        maxLimit = CustomKeywords.'connection.DataVerif.getMaxDataLimitPagination'(connAcso)
+
+						'array match mengenai data limit dan max limit'
+                        arrayMatch.add(WebUI.verifyMatch(dataLimit.toString(), maxLimit, false, FailureHandling.CONTINUE_ON_FAILURE))
+                    } else {
+						'array match mengenai data limit dan inputan user'
+                        arrayMatch.add(WebUI.verifyMatch(dataLimit.toString(), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
+                                    rowExcel('dataLimit')), false, FailureHandling.CONTINUE_ON_FAILURE))
+                    }
+                    
+					'jika dataoffset koosng dan template code kosong'
+                    if ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')) == '')) {
+					'array match mengenai data offset dan 0'
+                        arrayMatch.add(WebUI.verifyMatch(dataOffset.toString(), '0', false, FailureHandling.CONTINUE_ON_FAILURE))
+                    } else {
+						' array match mengenai data offset dan inputan data offset'
+                        arrayMatch.add(WebUI.verifyMatch(dataOffset.toString(), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
+                                    rowExcel('dataOffset')), false, FailureHandling.CONTINUE_ON_FAILURE))
+                    }
 					
-					WebUI.verifyEqual(totalData, result.size() / 6, FailureHandling.CONTINUE_ON_FAILURE)
-
-                    WebUI.verifyMatch(dataLimit.toString(), findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
-                                'dataLimit')), false, FailureHandling.CONTINUE_ON_FAILURE)
-
-                    WebUI.verifyMatch(dataOffset.toString(), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
-                            rowExcel('dataOffset')), false, FailureHandling.CONTINUE_ON_FAILURE)
-
-                    String resultsArray = ''
-
+					'looping'
                     for (index = 0; index < (result.size() / 6); index++) {
-                        if ((result.size() / 6) == 1) {
-                            resultsArray = 'Results'
-                        } else {
-                            resultsArray = ((('Results' + '[') + index) + ']')
-                        }
-                        
-                        'get API Key'
-                        resultsPerData = WS.getElementPropertyValue(respon, resultsArray, FailureHandling.OPTIONAL)
+                        'verify template type'
+                        arrayMatch.add(WebUI.verifyMatch(templateType[index], result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 
-                        'verify tenant code'
-                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateType'])[index], result[arrayIndex++], 
+                        'verify template code'
+                        arrayMatch.add(WebUI.verifyMatch(templateCode[index], result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify template name'
+                        arrayMatch.add(WebUI.verifyMatch(templateName[index], result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify template description'
+                        arrayMatch.add(WebUI.verifyMatch(templateDescription[index], result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify template language'
+                        arrayMatch.add(WebUI.verifyMatch(templateLanguage[index], result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify parameterdetails'
+                        arrayMatch.add(WebUI.verifyMatch((parameterDetails[index]).toString(), (result[arrayIndex++]).toString(), 
                                 false, FailureHandling.CONTINUE_ON_FAILURE))
-
-                        'verify tenant code'
-                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateCode'])[index], result[arrayIndex++], 
-                                false, FailureHandling.CONTINUE_ON_FAILURE))
-
-                        'verify tenant code'
-                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateName'])[index], result[arrayIndex++], 
-                                false, FailureHandling.CONTINUE_ON_FAILURE))
-
-                        'verify tenant code'
-                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateDescription'])[index], result[arrayIndex++], 
-                                false, FailureHandling.CONTINUE_ON_FAILURE))
-
-                        'verify tenant code'
-                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateLanguage'])[index], result[arrayIndex++], 
-                                false, FailureHandling.CONTINUE_ON_FAILURE))
-
-                        'verify tenant code'
-                        arrayMatch.add(WebUI.verifyMatch(resultsPerData['ParameterDetails'][index].toString(), result[arrayIndex++].toString(), false, FailureHandling.CONTINUE_ON_FAILURE))
                     }
                     
                     'jika data db tidak sesuai dengan excel'
@@ -175,7 +207,7 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
 
 def getErrorMessageAPI(ResponseObject respon) {
     'mengambil status code berdasarkan response HIT API'
-    message = WS.getElementPropertyValue(respon, 'status.message', FailureHandling.OPTIONAL)
+    message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
 
     'Write To Excel GlobalVariable.StatusFailed and errormessage'
     CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, GlobalVariable.StatusFailed, 

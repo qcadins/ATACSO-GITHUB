@@ -65,9 +65,6 @@ if (WS.verifyResponseStatusCode(respon, 200, FailureHandling.OPTIONAL) == true) 
             'declare arrayindex'
             arrayIndex = 0
 
-            'verify api key tidak sesuai dengan hashednya'
-            arrayMatch.add(WebUI.verifyNotMatch(apiKey, result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
-
             'verify description ms lov'
             arrayMatch.add(WebUI.verifyMatch('Generate API Key', result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 
