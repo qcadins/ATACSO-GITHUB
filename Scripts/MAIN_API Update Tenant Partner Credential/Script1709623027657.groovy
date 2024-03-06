@@ -15,8 +15,6 @@ GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExc
 
 int countColmExcel = findTestData(excelPath).columnNumbers
 
-semicolon = ';'
-
 for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (GlobalVariable.NumofColm)++) {
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break
@@ -61,7 +59,7 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                     'get current date'
                     String currentDate = new Date().format('yyyy-MM-dd')
 
-                    'ambil store db untuk add tenant'
+                    'ambil store db untuk get tenant'
                     ArrayList result = CustomKeywords.'connection.UpdateTenantPartnerCredential.getUpdateTenantPartnerCredentialStoreDB'(
                         connAcso, findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('tenantCode')))
 
@@ -79,10 +77,10 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                     arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
                                     'partnerCode')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 
-                    'verify null'
+                    'verify encrypted_access_token null'
                     arrayMatch.add(WebUI.verifyMatch('null', result[arrayIndex++].toString(), false, FailureHandling.CONTINUE_ON_FAILURE))
 
-                    'verify null'
+                    'verify access_token_expired_date null'
                     arrayMatch.add(WebUI.verifyMatch('null', result[arrayIndex++].toString(), false, FailureHandling.CONTINUE_ON_FAILURE))
 
                     'verify mengenai datetime terhadap current date'
@@ -128,4 +126,3 @@ def getErrorMessageAPI(ResponseObject respon) {
 def rowExcel(String cellValue) {
     CustomKeywords.'customizekeyword.WriteExcel.getExcelRow'(GlobalVariable.DataFilePath, sheet, cellValue)
 }
-
