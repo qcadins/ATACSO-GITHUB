@@ -29,7 +29,7 @@
       <matchCondition>equals</matchCondition>
       <name>Content-Type</name>
       <type>Main</type>
-      <value>text/plain</value>
+      <value>application/json-patch+json</value>
       <webElementGuid>62e8303b-1722-4f97-b5da-c850e6e7cec5</webElementGuid>
    </httpHeaderProperties>
    <httpHeaderProperties>

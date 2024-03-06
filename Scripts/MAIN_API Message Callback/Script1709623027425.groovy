@@ -13,15 +13,15 @@ Connection conneSign = CustomKeywords.'connection.ConnectDB.connectDBACSO'()
 'get data file path'
 GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExcelPath'('\\Excel\\2. ACSO.xlsx')
 
+'get total column excel'
 int countColmExcel = findTestData(excelPath).columnNumbers
-
-semicolon = ';'
 
 for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (GlobalVariable.NumofColm)++) {
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break	
     } else if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).equalsIgnoreCase('Unexecuted')) {
-        GlobalVariable.FlagFailed = 0
+        'Flag failed reset 0'
+		GlobalVariable.FlagFailed = 0
 
             'HIT API'
             respon = WS.sendRequest(findTestObject('Postman/Message Callback', [('requestDateTime') : findTestData(excelPath).getValue(
@@ -55,11 +55,11 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
 
             'Jika status HIT API Login 200 OK'
             if (WS.verifyResponseStatusCode(respon, 200, FailureHandling.OPTIONAL) == true) {
-                'get Status Code'
-                statusCode = WS.getElementPropertyValue(respon, 'status.code', FailureHandling.OPTIONAL)
+                'get message'
+                message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
 
-                'Jika status codenya 0'
-                if (statusCode == 0) {
+                'Jika messagenya success'
+                if (message == 'Success') {
                     if (GlobalVariable.FlagFailed == 0) {
                         'write to excel success'
                         CustomKeywords.'customizekeyword.WriteExcel.writeToExcel'(GlobalVariable.DataFilePath, sheet, 0, 
@@ -76,11 +76,11 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
 
 def getErrorMessageAPI(ResponseObject respon) {
     'mengambil status code berdasarkan response HIT API'
-    message = WS.getElementPropertyValue(respon, 'status.message', FailureHandling.OPTIONAL)
+    message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
 
     'Write To Excel GlobalVariable.StatusFailed and errormessage'
     CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, GlobalVariable.StatusFailed, 
-        ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Reason Failed')) + ';') + ('<' + message)) + 
+        ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Reason Failed')).replace('-', '') + ';') + ('<' + message)) + 
         '>')
 
     GlobalVariable.FlagFailed = 1

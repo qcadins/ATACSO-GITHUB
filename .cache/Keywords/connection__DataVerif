@@ -1,5 +1,5 @@
 {
-  "keywordFileContentHash": "95E4C119CCA4FD204DD1A14679280CD2",
+  "keywordFileContentHash": "FD965474ED2FF30D450AA64021EBD17D",
   "keywordClasses": [
     {
       "name": "connection.DataVerif",
@@ -46,11 +46,28 @@
                 "errorOnParsing": false
               }
             }
-          ],
-          "javadoc": ""
+          ]
+        },
+        {
+          "name": "getMaxDataLimitPagination",
+          "parameters": [
+            {
+              "name": "conn",
+              "initialExpression": "",
+              "type": {
+                "fullClassName": "java.sql.Connection",
+                "unresolvedClassName": "Connection",
+                "isArray": false,
+                "isGnericsPlaceHolder": false,
+                "hasImmutableClassName": false,
+                "genericsTypes": [],
+                "errorOnParsing": false
+              }
+            }
+          ]
         }
       ]
     }
   ],
-  "javadocParsed": true
+  "javadocParsed": false
 }

@@ -34,7 +34,7 @@ class ProcessMessageRequest {
 	getRetryCount(Connection conn, String requestUuid) {
 		stm = conn.createStatement()
 
-		resultSet = stm.executeQuery("select retry_count from tr_message_request where request_uuid = ''")
+		resultSet = stm.executeQuery("select retry_count from tr_message_request where request_uuid = '" + requestUuid + "'")
 		metadata = resultSet.metaData
 
 		columnCount = metadata.getColumnCount()

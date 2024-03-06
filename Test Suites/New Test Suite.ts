@@ -12,22 +12,22 @@
    <rerunImmediately>false</rerunImmediately>
    <testSuiteGuid>a343769c-8353-46a1-bbaf-818db07ef804</testSuiteGuid>
    <testCaseLink>
-      <guid>56b1cc15-45ee-42c8-8b66-8cbc08806c0b</guid>
+      <guid>3a204d19-7e1f-40b1-a970-fe3c2bef961d</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/MAIN_API Update Tenant Partner Credential</testCaseId>
+      <testCaseId>Test Cases/MAIN_API Send Message</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
          <value></value>
-         <variableId>eea81815-c52b-4195-b574-f622807b1488</variableId>
+         <variableId>56558de3-5f88-43af-8d0e-138768681e53</variableId>
       </variableLink>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
          <value></value>
-         <variableId>80c53793-3528-4d41-a51c-23f498b70b70</variableId>
+         <variableId>0e03cdf7-eb3c-4ab6-ab63-f617e3fb33d4</variableId>
       </variableLink>
    </testCaseLink>
 </TestSuiteEntity>

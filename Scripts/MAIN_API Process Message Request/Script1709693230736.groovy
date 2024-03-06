@@ -15,32 +15,36 @@ GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExc
 
 int countColmExcel = findTestData(excelPath).columnNumbers
 
-semicolon = ';'
-
 for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (GlobalVariable.NumofColm)++) {
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break
     } else if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).equalsIgnoreCase('Unexecuted')) {
+        'diberikan max looping'
         maxLoopingRetry = 1
 
+        'looping max looping'
         for (loopingRetry = 1; loopingRetry <= maxLoopingRetry; loopingRetry++) {
             'inisiasi flag failed = 0'
             GlobalVariable.FlagFailed = 0
 
+            'ambil retry count before'
             int retryCountBefore = Integer.parseInt(CustomKeywords.'connection.ProcessMessageRequest.getRetryCount'(connAcso, 
                     findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('requestUuid'))))
 
+            'hit api'
             ResponseObject respon = hitAPI()
 
             'Jika status HIT API Login 200 OK'
             if (WS.verifyResponseStatusCode(respon, 200, FailureHandling.OPTIONAL) == true) {
-                'get API Key'
-                apiKey = WS.getElementPropertyValue(respon, 'ApiKey', FailureHandling.OPTIONAL)
+                'get message'
+                message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
 
-                'Jika API Key tidak kosong'
-                if (apiKey.toString() != 'null') {
+                'Jika message success'
+                if (message == 'Success') {
                     'jika setting check store db hidup'
                     if (GlobalVariable.checkStoreDB == 'Yes') {
+                        'pause storedb dikarenakan testing failed terus. Sudah tanya dev'
+
                         'get current date'
                         String currentDate = new Date().format('yyyy-MM-dd')
 
@@ -154,7 +158,7 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
 
 def getErrorMessageAPI(ResponseObject respon) {
     'mengambil status code berdasarkan response HIT API'
-    message = WS.getElementPropertyValue(respon, 'status.message', FailureHandling.OPTIONAL)
+    message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
 
     'Write To Excel GlobalVariable.StatusFailed and errormessage'
     CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, GlobalVariable.StatusFailed, 

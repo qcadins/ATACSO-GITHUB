@@ -11,7 +11,7 @@
    <followRedirects>false</followRedirects>
    <httpBody></httpBody>
    <httpBodyContent>{
-  &quot;text&quot;: &quot;{\n  \&quot;requestDateTime\&quot;: \&quot;${requestDateTime}\&quot;,\n  \&quot;rowVersion\&quot;: \&quot;${rowVersion}\&quot;,\n  \&quot;receiverPhone\&quot;: \&quot;${receiverPhone}\&quot;,\n  \&quot;referenceNo\&quot;: \&quot;${referenceNo}\&quot;,\n  \&quot;templateCode\&quot;: \&quot;${templateCode}\&quot;,\n  \&quot;headerParam\&quot;: ${headerParam},\n  \&quot;bodyParam\&quot;: ${headerParam},\n  \&quot;buttonParam\&quot;: ${buttonParam}\n  \&quot;requestUuid\&quot;: \&quot;${requestUuid}\&quot;,\n  \&quot;partnerCode\&quot;: \&quot;${partnerCode}\&quot;\n}&quot;,
+  &quot;text&quot;: &quot;{\n  \&quot;requestDateTime\&quot;: \&quot;${requestDateTime}\&quot;,\n  \&quot;rowVersion\&quot;: \&quot;${rowVersion}\&quot;,\n  \&quot;receiverPhone\&quot;: \&quot;${receiverPhone}\&quot;,\n  \&quot;referenceNo\&quot;: \&quot;${referenceNo}\&quot;,\n  \&quot;templateCode\&quot;: \&quot;${templateCode}\&quot;,\n  \&quot;headerParam\&quot;: ${headerParam},\n  \&quot;bodyParam\&quot;: ${headerParam},\n  \&quot;buttonParam\&quot;: ${buttonParam},\n  \&quot;requestUuid\&quot;: \&quot;${requestUuid}\&quot;,\n  \&quot;partnerCode\&quot;: \&quot;${partnerCode}\&quot;\n}&quot;,
   &quot;contentType&quot;: &quot;text/plain&quot;,
   &quot;charset&quot;: &quot;UTF-8&quot;
 }</httpBodyContent>
