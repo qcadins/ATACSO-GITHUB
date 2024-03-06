@@ -8,7 +8,7 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable as GlobalVariable
 import java.sql.Connection as Connection
 
-Connection conneSign = CustomKeywords.'connection.ConnectDB.connectDBACSO'()
+Connection connAcso = CustomKeywords.'connection.ConnectDB.connectDBACSO'()
 
 'get data file path'
 GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExcelPath'('\\Excel\\2. ACSO.xlsx')
@@ -21,68 +21,131 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break
     } else if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).equalsIgnoreCase('Unexecuted')) {
-		'inisiasi flag failed = 0'
-		GlobalVariable.FlagFailed = 0
+        'inisiasi flag failed = 0'
+        GlobalVariable.FlagFailed = 0
 
-		'call test case untuk mendapatkan api key'
-		WebUI.callTestCase(findTestCase('Login By Role'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
+        'call test case untuk mendapatkan api key'
+        WebUI.callTestCase(findTestCase('Generate New API Key'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
 
-            'HIT API'
-            respon = WS.sendRequest(findTestObject('Postman/Get List Message Template', [('requestDateTime') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('rowVersion')), ('templateType') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('templateType')), ('templateCode') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('templateCode')), ('dataLimit') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('dataLimit')), ('dataOffset') : findTestData(excelPath).getValue(
-                            GlobalVariable.NumofColm, rowExcel('dataOffset'))]))
+        String paginationDetails = ''
 
-            'ambil lama waktu yang diperlukan hingga request menerima balikan'
-            elapsedTime = ((respon.elapsedTime / 1000) + ' second')
+        if ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')).length() > 0) || (findTestData(
+            excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')).length() > 0)) {
+            paginationDetails = (paginationDetails + '"paginationDetails": {')
 
-            'ambil body dari hasil respons'
-            responseBody = respon.responseBodyContent
+            if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')).length() > 0) {
+                paginationDetails = (((paginationDetails + '"dataLimit": ') + findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
+                    rowExcel('dataLimit'))) + ',')
+            }
+            
+            if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')).length() > 0) {
+                paginationDetails = (((paginationDetails + '"dataOffset": ') + findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
+                    rowExcel('dataOffset'))) + ',')
+            }
+            
+            paginationDetails = (paginationDetails.replaceAll('(,*$)', '') + '},')
+        }
+        
+        'HIT API'
+        respon = WS.sendRequest(findTestObject('Postman/Get List Message Template', [('requestDateTime') : findTestData(
+                        excelPath).getValue(GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : '', ('templateType') : findTestData(
+                        excelPath).getValue(GlobalVariable.NumofColm, rowExcel('templateType')), ('templateCode') : findTestData(
+                        excelPath).getValue(GlobalVariable.NumofColm, rowExcel('templateCode')), ('paginationDetails') : paginationDetails]))
 
-            'panggil keyword untuk proses beautify dari respon json yang didapat'
-            CustomKeywords.'customizekeyword.BeautifyJson.process'(responseBody, sheet, rowExcel('Respons') - 1, findTestData(
-                    excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Scenario')))
+        'ambil lama waktu yang diperlukan hingga request menerima balikan'
+        elapsedTime = ((respon.elapsedTime / 1000) + ' second')
 
-            'write to excel response elapsed time'
-            CustomKeywords.'customizekeyword.WriteExcel.writeToExcel'(GlobalVariable.DataFilePath, sheet, rowExcel('Process Time') - 
-                1, GlobalVariable.NumofColm - 1, elapsedTime.toString())
+        'ambil body dari hasil respons'
+        responseBody = respon.responseBodyContent
 
-            'Jika status HIT API Login 200 OK'
-            if (WS.verifyResponseStatusCode(respon, 200, FailureHandling.OPTIONAL) == true) {
+        'panggil keyword untuk proses beautify dari respon json yang didapat'
+        CustomKeywords.'customizekeyword.BeautifyJson.process'(responseBody, sheet, rowExcel('Respons') - 1, findTestData(
+                excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Scenario')))
+
+        'write to excel response elapsed time'
+        CustomKeywords.'customizekeyword.WriteExcel.writeToExcel'(GlobalVariable.DataFilePath, sheet, rowExcel('Process Time') - 
+            1, GlobalVariable.NumofColm - 1, elapsedTime.toString())
+
+        'Jika status HIT API Login 200 OK'
+        if (WS.verifyResponseStatusCode(respon, 200, FailureHandling.OPTIONAL) == true) {
             'get API Key'
-            apiKey = WS.getElementPropertyValue(respon, 'ApiKey', FailureHandling.OPTIONAL)
+            message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
 
-            'Jika API Key tidak kosong'
-            if (apiKey.toString() != 'null') {
+            'Jika message success'
+            if (message.toString() == 'Success') {
                 'jika setting check store db hidup'
                 if (GlobalVariable.checkStoreDB == 'Yes') {
-                    'get current date'
-                    String currentDate = new Date().format('yyyy-MM-dd')
-
-                    'ambil store db untuk add tenant'
-                    ArrayList result = CustomKeywords.'connection.AddTenant.getAddTenantStoreDB'(connAcso, findTestData(
-                            excelPath).getValue(GlobalVariable.NumofColm, rowExcel('tenantCode')))
+                    'declare arrayindex'
+                    arrayIndex = 0
 
                     'declare arraylist arraymatch'
                     ArrayList arrayMatch = []
 
-                    'declare arrayindex'
-                    arrayIndex = 0
+                    'get API Key'
+                    dataLimit = WS.getElementPropertyValue(respon, 'DataLimit', FailureHandling.OPTIONAL)
 
-                    'verify tenant code'
-                    arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
-                                    'tenantCode')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+                    'get API Key'
+                    dataOffset = WS.getElementPropertyValue(respon, 'DataOffset', FailureHandling.OPTIONAL)
 
-                    'verify tenant name'
-                    arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
-                                    'tenantName')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+					'get API Key'
+					totalData = WS.getElementPropertyValue(respon, 'TotalData', FailureHandling.OPTIONAL)
+
+                    'get API Key'
+                    ArrayList resultsAll = WS.getElementPropertyValue(respon, 'Results', FailureHandling.OPTIONAL)
+
+                    'ambil store db untuk add tenant'
+                    ArrayList result = CustomKeywords.'connection.GetListMessageTemplate.getGetListMessageTemplateStoreDB'(
+                        connAcso, findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('tenantCode')), findTestData(
+                            excelPath).getValue(GlobalVariable.NumofColm, rowExcel('templateCode')), findTestData(excelPath).getValue(
+                            GlobalVariable.NumofColm, rowExcel('dataLimit')), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
+                            rowExcel('dataOffset')))
+
+                    WebUI.verifyEqual(resultsAll.size(), result.size() / 6, FailureHandling.CONTINUE_ON_FAILURE)
 					
-                    'verify mengenai datetime terhadap current date'
-                    arrayMatch.add(WebUI.verifyMatch(currentDate, result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
+					WebUI.verifyEqual(totalData, result.size() / 6, FailureHandling.CONTINUE_ON_FAILURE)
 
+                    WebUI.verifyMatch(dataLimit.toString(), findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
+                                'dataLimit')), false, FailureHandling.CONTINUE_ON_FAILURE)
+
+                    WebUI.verifyMatch(dataOffset.toString(), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
+                            rowExcel('dataOffset')), false, FailureHandling.CONTINUE_ON_FAILURE)
+
+                    String resultsArray = ''
+
+                    for (index = 0; index < (result.size() / 6); index++) {
+                        if ((result.size() / 6) == 1) {
+                            resultsArray = 'Results'
+                        } else {
+                            resultsArray = ((('Results' + '[') + index) + ']')
+                        }
+                        
+                        'get API Key'
+                        resultsPerData = WS.getElementPropertyValue(respon, resultsArray, FailureHandling.OPTIONAL)
+
+                        'verify tenant code'
+                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateType'])[index], result[arrayIndex++], 
+                                false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify tenant code'
+                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateCode'])[index], result[arrayIndex++], 
+                                false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify tenant code'
+                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateName'])[index], result[arrayIndex++], 
+                                false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify tenant code'
+                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateDescription'])[index], result[arrayIndex++], 
+                                false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify tenant code'
+                        arrayMatch.add(WebUI.verifyMatch((resultsPerData['TemplateLanguage'])[index], result[arrayIndex++], 
+                                false, FailureHandling.CONTINUE_ON_FAILURE))
+
+                        'verify tenant code'
+                        arrayMatch.add(WebUI.verifyMatch(resultsPerData['ParameterDetails'][index].toString(), result[arrayIndex++].toString(), false, FailureHandling.CONTINUE_ON_FAILURE))
+                    }
+                    
                     'jika data db tidak sesuai dengan excel'
                     if (arrayMatch.contains(false)) {
                         GlobalVariable.FlagFailed = 1
@@ -105,8 +168,8 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                 getErrorMessageAPI(respon)
             }
         } else {
-                getErrorMessageAPI(respon)
-            }
+            getErrorMessageAPI(respon)
+        }
     }
 }
 

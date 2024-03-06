@@ -21,7 +21,7 @@
       <matchCondition>equals</matchCondition>
       <name>accept</name>
       <type>Main</type>
-      <value>text/plain</value>
+      <value>*/*</value>
       <webElementGuid>851a5b81-e505-4d1a-ae50-d2b01f0aee1e</webElementGuid>
    </httpHeaderProperties>
    <httpHeaderProperties>

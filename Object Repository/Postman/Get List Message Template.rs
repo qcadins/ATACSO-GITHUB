@@ -11,7 +11,7 @@
    <followRedirects>false</followRedirects>
    <httpBody></httpBody>
    <httpBodyContent>{
-  &quot;text&quot;: &quot;{\n  \&quot;requestDateTime\&quot;: \&quot;${requestDateTime}\&quot;,\n  \&quot;rowVersion\&quot;: \&quot;${rowVersion}\&quot;,\n  \&quot;paginationDetails\&quot;: {\n    \&quot;dataLimit\&quot;: ${dataLimit},\n    \&quot;dataOffset\&quot;: ${dataOffset}\n  },\n  \&quot;templateType\&quot;: \&quot;${templateType}\&quot;,\n  \&quot;templateCode\&quot;: \&quot;${templateCode}\&quot;\n}&quot;,
+  &quot;text&quot;: &quot;{\n  \&quot;requestDateTime\&quot;: \&quot;${requestDateTime}\&quot;,\n  \&quot;rowVersion\&quot;: \&quot;${rowVersion}\&quot;,\n  ${paginationDetails}\n  \&quot;templateType\&quot;: \&quot;${templateType}\&quot;,\n  \&quot;templateCode\&quot;: \&quot;${templateCode}\&quot;\n}&quot;,
   &quot;contentType&quot;: &quot;text/plain&quot;,
   &quot;charset&quot;: &quot;UTF-8&quot;
 }</httpBodyContent>
@@ -29,7 +29,7 @@
       <matchCondition>equals</matchCondition>
       <name>Content-Type</name>
       <type>Main</type>
-      <value>text/plain</value>
+      <value>application/json-patch+json</value>
       <webElementGuid>f735b52d-c44d-4793-8142-a2a83bca0a94</webElementGuid>
    </httpHeaderProperties>
    <httpHeaderProperties>
