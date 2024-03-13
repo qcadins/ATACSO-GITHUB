@@ -15,6 +15,8 @@ GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExc
 
 int countColmExcel = findTestData(excelPath).columnNumbers
 
+firstRun = 0
+
 for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (GlobalVariable.NumofColm)++) {
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break
@@ -22,9 +24,27 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
         'inisiasi flag failed = 0'
         GlobalVariable.FlagFailed = 0
 
-        'call test case untuk mendapatkan api key'
-        WebUI.callTestCase(findTestCase('Login By Role'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
+        'check apakah url yang salah. Jika bukan salah, '
+        if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Use Correct Base Url')) != 'No') {
+            'jika first run belum aktif'
+            if (firstRun == 0) {
+                'call test case untuk mendapatkan api key'
+                WebUI.callTestCase(findTestCase('Login By Role'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
 
+                'aktif first run'
+                firstRun = 1
+            }
+        }
+        
+        'jika setting correct tokennya salah'
+        if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('use Correct Token')) == 'No') {
+            'setting wrong token based on input'
+            GlobalVariable.AdInsKey = findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Wrong Token'))
+        } else {
+            'menggunakan correct token'
+            GlobalVariable.AdInsKey = GlobalVariable.TrueAdInsKey
+        }
+        
         'HIT API'
         respon = WS.sendRequest(findTestObject('Postman/Add Tenant', [('requestDateTime') : findTestData(excelPath).getValue(
                         GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : '', ('tenantCode') : findTestData(
@@ -74,7 +94,7 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                     'verify tenant name'
                     arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
                                     'tenantName')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
-					
+
                     'verify mengenai datetime terhadap current date'
                     arrayMatch.add(WebUI.verifyMatch(currentDate, result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 
@@ -112,7 +132,8 @@ def getErrorMessageAPI(ResponseObject respon) {
 
     'Write To Excel GlobalVariable.StatusFailed and errormessage'
     CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, GlobalVariable.StatusFailed, 
-        ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Reason Failed')).replace('-', '') + ';') + ('<' + message)) + '>')
+        ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Reason Failed')).replace('-', '') + ';') + 
+        ('<' + message)) + '>')
 
     GlobalVariable.FlagFailed = 1
 }

@@ -10,36 +10,33 @@ CustomKeywords.'connection.DataVerif.settingBaseUrl'(excelPath, GlobalVariable.N
 
 'HIT API Login untuk get token'
 responLogin = WS.sendRequest(findTestObject('Postman/Login By Role', [('requestDateTime') : findTestData(excelPath).getValue(
-				GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : '', ('loginId') : findTestData(
-				excelPath).getValue(GlobalVariable.NumofColm, rowExcel('loginId Authentication')), ('password') : findTestData(
-				excelPath).getValue(GlobalVariable.NumofColm, rowExcel('password Authentication')), ('roleCode') : findTestData(
-				excelPath).getValue(GlobalVariable.NumofColm, rowExcel('roleCode Authentication')), ('tenantCode') : findTestData(
-				excelPath).getValue(GlobalVariable.NumofColm, rowExcel('tenantCode Authentication'))]))
+                GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : '', ('loginId') : findTestData(
+                excelPath).getValue(GlobalVariable.NumofColm, rowExcel('loginId Authentication')), ('password') : findTestData(
+                excelPath).getValue(GlobalVariable.NumofColm, rowExcel('password Authentication')), ('roleCode') : findTestData(
+                excelPath).getValue(GlobalVariable.NumofColm, rowExcel('roleCode Authentication')), ('tenantCode') : findTestData(
+                excelPath).getValue(GlobalVariable.NumofColm, rowExcel('tenantCode Authentication'))]))
 
 'Jika status HIT API Login 200 OK'
 if (WS.verifyResponseStatusCode(responLogin, 200, FailureHandling.OPTIONAL) == true) {
-	if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('use Correct Token')) == 'No') {
-		GlobalVariable.AdInsKey = findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Wrong Token'))
-	} else {
-		'adins key'
-		GlobalVariable.AdInsKey = WS.getElementPropertyValue(responLogin, 'token')
-	}
+    'adins key'
+    GlobalVariable.TrueAdInsKey = WS.getElementPropertyValue(responLogin, 'token')
 } else {
-	getErrorMessageAPI(responLogin)
+    getErrorMessageAPI(responLogin)
 }
 
 def getErrorMessageAPI(ResponseObject respon) {
-	'mengambil status code berdasarkan response HIT API'
-	message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
-	
-	'Write To Excel GlobalVariable.StatusFailed and errormessage'
-	CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, GlobalVariable.StatusFailed,
-		((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Reason Failed')) + ';') + ('<' + message)) +
-		'>')
+    'mengambil status code berdasarkan response HIT API'
+    message = WS.getElementPropertyValue(respon, 'Message', FailureHandling.OPTIONAL)
 
-	GlobalVariable.FlagFailed = 1
+    'Write To Excel GlobalVariable.StatusFailed and errormessage'
+    CustomKeywords.'customizekeyword.WriteExcel.writeToExcelStatusReason'(sheet, GlobalVariable.NumofColm, GlobalVariable.StatusFailed, 
+        ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Reason Failed')) + ';') + ('<' + message)) + 
+        '>')
+
+    GlobalVariable.FlagFailed = 1
 }
 
 def rowExcel(String cellValue) {
-	CustomKeywords.'customizekeyword.WriteExcel.getExcelRow'(GlobalVariable.DataFilePath, sheet, cellValue)
+    CustomKeywords.'customizekeyword.WriteExcel.getExcelRow'(GlobalVariable.DataFilePath, sheet, cellValue)
 }
+

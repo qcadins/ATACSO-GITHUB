@@ -16,6 +16,8 @@ GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExc
 'dapat total column'
 int countColmExcel = findTestData(excelPath).columnNumbers
 
+firstRun = 0
+
 for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (GlobalVariable.NumofColm)++) {
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break
@@ -23,33 +25,52 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
         'inisiasi flag failed = 0'
         GlobalVariable.FlagFailed = 0
 
-        'call test case untuk mendapatkan api key'
-        WebUI.callTestCase(findTestCase('Generate New API Key'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
+        'check apakah url yang salah. Jika bukan salah, '
+        if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Use Correct Base Url')) != 'No') {
+            'jika first run belum aktif'
+            if (firstRun == 0) {
+                'call test case untuk mendapatkan api key'
+                WebUI.callTestCase(findTestCase('Generate New API Key'), [('excelPath') : excelPath, ('sheet') : sheet], 
+                    FailureHandling.CONTINUE_ON_FAILURE)
 
-		'rakit paginationDetails'
+                'aktif first run'
+                firstRun = 1
+            }
+        }
+        
+        'jika setting correct tokennya salah'
+        if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('use Correct Token')) == 'No') {
+            'setting wrong token based on input'
+            GlobalVariable.AdInsKey = findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Wrong Token'))
+        } else {
+            'menggunakan correct token'
+            GlobalVariable.AdInsKey = GlobalVariable.TrueAdInsKey
+        }
+        
+        'rakit paginationDetails'
         String paginationDetails = ''
 
-		'jika dataLimit atau data offset ada value'
+        'jika dataLimit atau data offset ada value'
         if ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')).length() > 0) || (findTestData(
             excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')).length() > 0)) {
-			'rakit'
+            'rakit'
             paginationDetails = (paginationDetails + '"paginationDetails": {')
 
-			'jika data limit ada value'
+            'jika data limit ada value'
             if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')).length() > 0) {
-				'rakit datalimit'
+                'rakit datalimit'
                 paginationDetails = (((paginationDetails + '"dataLimit": ') + findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
                     rowExcel('dataLimit'))) + ',')
             }
             
-			'jika data offset ada value'
+            'jika data offset ada value'
             if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')).length() > 0) {
-				'rakit data offset'
+                'rakit data offset'
                 paginationDetails = (((paginationDetails + '"dataOffset": ') + findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
                     rowExcel('dataOffset'))) + ',')
             }
             
-			'menghapus akhir comma'
+            'menghapus akhir comma'
             paginationDetails = (paginationDetails.replaceAll('(,*$)', '') + '},')
         }
         
@@ -103,19 +124,19 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                     'get parameter details'
                     parameterDetails = WS.getElementPropertyValue(respon, 'Results.ParameterDetails', FailureHandling.OPTIONAL)
 
-					'get template type'
+                    'get template type'
                     templateType = WS.getElementPropertyValue(respon, 'Results.TemplateType', FailureHandling.OPTIONAL)
 
-					'get template code'
+                    'get template code'
                     templateCode = WS.getElementPropertyValue(respon, 'Results.TemplateCode', FailureHandling.OPTIONAL)
 
-					'get template name'
+                    'get template name'
                     templateName = WS.getElementPropertyValue(respon, 'Results.TemplateName', FailureHandling.OPTIONAL)
 
-					'get template description'
+                    'get template description'
                     templateDescription = WS.getElementPropertyValue(respon, 'Results.TemplateDescription', FailureHandling.OPTIONAL)
 
-					'get template language'
+                    'get template language'
                     templateLanguage = WS.getElementPropertyValue(respon, 'Results.TemplateLanguage', FailureHandling.OPTIONAL)
 
                     'ambil store db untuk add tenant'
@@ -125,36 +146,36 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                             GlobalVariable.NumofColm, rowExcel('dataLimit')), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
                             rowExcel('dataOffset')))
 
-					'array match mengenai total data results'
+                    'array match mengenai total data results'
                     arrayMatch.add(WebUI.verifyEqual(resultsAll.size(), result.size() / 6, FailureHandling.CONTINUE_ON_FAILURE))
 
-					'array match mengenai total data'
+                    'array match mengenai total data'
                     arrayMatch.add(WebUI.verifyEqual(totalData, result.size() / 6, FailureHandling.CONTINUE_ON_FAILURE))
 
-					'jika datalimit dan kosong dan template code kosong'
-                    if ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')) == '')) {
-						'ambil max limit dari genset'
+                    'jika datalimit dan kosong dan template code kosong'
+                    if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataLimit')) == '') {
+                        'ambil max limit dari genset'
                         maxLimit = CustomKeywords.'connection.DataVerif.getMaxDataLimitPagination'(connAcso)
 
-						'array match mengenai data limit dan max limit'
+                        'array match mengenai data limit dan max limit'
                         arrayMatch.add(WebUI.verifyMatch(dataLimit.toString(), maxLimit, false, FailureHandling.CONTINUE_ON_FAILURE))
                     } else {
-						'array match mengenai data limit dan inputan user'
+                        'array match mengenai data limit dan inputan user'
                         arrayMatch.add(WebUI.verifyMatch(dataLimit.toString(), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
                                     rowExcel('dataLimit')), false, FailureHandling.CONTINUE_ON_FAILURE))
                     }
                     
-					'jika dataoffset koosng dan template code kosong'
-                    if ((findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')) == '')) {
-					'array match mengenai data offset dan 0'
+                    'jika dataoffset koosng dan template code kosong'
+                    if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('dataOffset')) == '') {
+                        'array match mengenai data offset dan 0'
                         arrayMatch.add(WebUI.verifyMatch(dataOffset.toString(), '0', false, FailureHandling.CONTINUE_ON_FAILURE))
                     } else {
-						' array match mengenai data offset dan inputan data offset'
+                        ' array match mengenai data offset dan inputan data offset'
                         arrayMatch.add(WebUI.verifyMatch(dataOffset.toString(), findTestData(excelPath).getValue(GlobalVariable.NumofColm, 
                                     rowExcel('dataOffset')), false, FailureHandling.CONTINUE_ON_FAILURE))
                     }
-					
-					'looping'
+                    
+                    'looping'
                     for (index = 0; index < (result.size() / 6); index++) {
                         'verify template type'
                         arrayMatch.add(WebUI.verifyMatch(templateType[index], result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))

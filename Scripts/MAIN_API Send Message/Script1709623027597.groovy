@@ -16,6 +16,8 @@ GlobalVariable.DataFilePath = CustomKeywords.'customizekeyword.WriteExcel.getExc
 'get total column'
 int countColmExcel = findTestData(excelPath).columnNumbers
 
+firstRun = 0
+
 for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (GlobalVariable.NumofColm)++) {
     if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Status')).length() == 0) {
         break
@@ -23,9 +25,28 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
         'inisiasi flag failed = 0'
         GlobalVariable.FlagFailed = 0
 
-        'call test case untuk mendapatkan api key'
-        WebUI.callTestCase(findTestCase('Generate New API Key'), [('excelPath') : excelPath, ('sheet') : sheet], FailureHandling.CONTINUE_ON_FAILURE)
+        'check apakah url yang salah. Jika bukan salah, '
+        if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Use Correct Base Url')) != 'No') {
+            'jika first run belum aktif'
+            if (firstRun == 0) {
+                'call test case untuk mendapatkan api key'
+                WebUI.callTestCase(findTestCase('Generate New API Key'), [('excelPath') : excelPath, ('sheet') : sheet], 
+                    FailureHandling.CONTINUE_ON_FAILURE)
 
+                'aktif first run'
+                firstRun = 1
+            }
+        }
+        
+        'jika setting correct tokennya salah'
+        if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('use Correct Token')) == 'No') {
+            'setting wrong token based on input'
+            GlobalVariable.AdInsKey = findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Wrong Token'))
+        } else {
+            'menggunakan correct token'
+            GlobalVariable.AdInsKey = GlobalVariable.TrueAdInsKey
+        }
+        
         'HIT API'
         respon = WS.sendRequest(findTestObject('Postman/Send Message', [('requestDateTime') : findTestData(excelPath).getValue(
                         GlobalVariable.NumofColm, rowExcel('requestDateTime')), ('rowVersion') : '', ('receiverPhone') : findTestData(
@@ -83,7 +104,7 @@ for (GlobalVariable.NumofColm = 2; GlobalVariable.NumofColm <= countColmExcel; (
                     arrayMatch.add(WebUI.verifyMatch(findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel(
                                     'tenantCode')), result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 
-                    'verify'
+                    'verify conversation message id'
                     arrayMatch.add(WebUI.verifyMatch('Message published successfully.', result[arrayIndex++], false, FailureHandling.CONTINUE_ON_FAILURE))
 
                     'verify reference no'

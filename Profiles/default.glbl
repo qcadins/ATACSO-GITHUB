@@ -54,4 +54,9 @@
       <initValue>''</initValue>
       <name>AdInsKey</name>
    </GlobalVariableEntity>
+   <GlobalVariableEntity>
+      <description></description>
+      <initValue>''</initValue>
+      <name>TrueAdInsKey</name>
+   </GlobalVariableEntity>
 </GlobalVariableEntities>

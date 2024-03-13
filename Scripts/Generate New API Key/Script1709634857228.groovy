@@ -41,15 +41,10 @@ if (WS.verifyResponseStatusCode(respon, 200, FailureHandling.OPTIONAL) == true) 
     'get API Key'
     apiKey = WS.getElementPropertyValue(respon, 'ApiKey', FailureHandling.OPTIONAL)
 
+    GlobalVariable.TrueAdInsKey = apiKey
+
     'Jika API Key tidak kosong'
     if (apiKey.toString() != 'null') {
-		'api key response akan menjadi AdInsKey untuk supporting'
-		if (findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('use Correct Token Tenant')) == 'Yes') {
-			GlobalVariable.AdInsKey = apiKey
-		} else {
-			GlobalVariable.AdInsKey = findTestData(excelPath).getValue(GlobalVariable.NumofColm, rowExcel('Wrong Token Tenant'))
-		}
-		
         'jika setting check store db hidup'
         if (GlobalVariable.checkStoreDB == 'Yes') {
             'get current date'
